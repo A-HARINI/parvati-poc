@@ -10,6 +10,7 @@ import {
   getBrands,
   bulkDeleteProducts,
   bulkUpdateProducts,
+  searchSuggestions,
 } from '../controllers/productController';
 import { authenticateAdmin } from '../middleware/authMiddleware';
 
@@ -19,6 +20,7 @@ router.get('/', getProducts);
 router.get('/categories', getCategories);
 router.get('/price-range', getPriceRange);
 router.get('/brands', getBrands);
+router.get('/search-suggestions', searchSuggestions);
 router.post('/bulk-delete', authenticateAdmin, bulkDeleteProducts);
 router.put('/bulk-update', authenticateAdmin, bulkUpdateProducts);
 router.get('/:id', getProduct);

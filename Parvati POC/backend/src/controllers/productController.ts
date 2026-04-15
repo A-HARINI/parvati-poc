@@ -141,6 +141,17 @@ export async function getBrands(req: Request, res: Response, next: NextFunction)
   }
 }
 
+export async function searchSuggestions(req: Request, res: Response, next: NextFunction) {
+  try {
+    const keyword = String(req.query.q || '');
+    const limit = Math.min(Number(req.query.limit) || 8, 20);
+    const suggestions = await productModel.searchSuggestions(keyword, limit);
+    res.json(suggestions);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function bulkDeleteProducts(req: Request, res: Response, next: NextFunction) {
   try {
     const { ids } = req.body;

@@ -154,3 +154,31 @@ export async function getBrands() {
   const brands = await Product.distinct('brand', { brand: { $ne: '' } });
   return brands.sort();
 }
+
+export async function searchSuggestions(keyword: string, limit = 8) {
+  if (!keyword || !keyword.trim()) return [];
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = { $regex: escaped, $options: 'i' };
+
+  const [products, categories] = await Promise.all([
+    Product.find(
+      { $or: [{ name: regex }, { brand: regex }] },
+      { name: 1, category: 1, brand: 1, image: 1, price: 1 }
+    )
+      .limit(limit)
+      .lean(),
+    Product.distinct('category', { category: regex }),
+  ]);
+
+  return {
+    products: products.map((p) => ({
+      id: p._id,
+      name: p.name,
+      category: p.category,
+      brand: p.brand,
+      image: p.image,
+      price: p.price,
+    })),
+    categories: categories.slice(0, 4),
+  };
+}

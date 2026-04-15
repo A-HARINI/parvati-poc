@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ShoppingCart, Search, Menu, X, User, ChevronDown } from 'lucide-react';
+import { fetchSearchSuggestions, type SearchSuggestion } from '@/lib/api';
 
 interface NavbarProps {
   searchValue: string;
@@ -15,6 +16,114 @@ interface NavbarProps {
 export default function Navbar({ searchValue, onSearchChange, cartCount = 0, categories = [], selectedCategory = 'All', onCategoryChange }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [categorySuggestions, setCategorySuggestions] = useState<string[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const API_BASE = '';
+
+  // Fetch suggestions with debounce
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (!query.trim() || query.trim().length < 2) {
+      setSuggestions([]);
+      setCategorySuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const data = await fetchSearchSuggestions(query);
+      setSuggestions(data.products);
+      setCategorySuggestions(data.categories);
+      setShowDropdown(data.products.length > 0 || data.categories.length > 0);
+      setHighlightIndex(-1);
+    } catch {
+      setSuggestions([]);
+      setCategorySuggestions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchSuggestions(searchValue), 250);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [searchValue, fetchSuggestions]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearch = (query: string) => {
+    setShowDropdown(false);
+    onSearchChange(query);
+  };
+
+  const handleSelectProduct = (product: SearchSuggestion) => {
+    setShowDropdown(false);
+    onSearchChange(product.name);
+  };
+
+  const handleSelectCategory = (category: string) => {
+    setShowDropdown(false);
+    onSearchChange('');
+    onCategoryChange?.(category);
+  };
+
+  const allItems = [
+    ...categorySuggestions.map((c) => ({ type: 'category' as const, value: c })),
+    ...suggestions.map((p) => ({ type: 'product' as const, value: p })),
+  ];
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || allItems.length === 0) {
+      if (e.key === 'Enter') {
+        handleSearch(searchValue);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightIndex((prev) => (prev < allItems.length - 1 ? prev + 1 : 0));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightIndex((prev) => (prev > 0 ? prev - 1 : allItems.length - 1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightIndex >= 0 && highlightIndex < allItems.length) {
+          const item = allItems[highlightIndex];
+          if (item.type === 'category') {
+            handleSelectCategory(item.value as string);
+          } else {
+            handleSelectProduct(item.value as SearchSuggestion);
+          }
+        } else {
+          handleSearch(searchValue);
+        }
+        break;
+      case 'Escape':
+        setShowDropdown(false);
+        inputRef.current?.blur();
+        break;
+    }
+  };
 
   return (
     <>
@@ -47,28 +156,124 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
           </div>
 
           {/* Search bar — centered */}
-          <div className="relative flex flex-1 mx-1 sm:mx-3 max-w-2xl">
+          <div className="relative flex flex-1 mx-1 sm:mx-3 max-w-2xl" ref={dropdownRef}>
             <div className={`flex w-full overflow-hidden rounded-xl border-2 transition-all ${searchFocused ? 'border-cta shadow-glow' : 'border-border-color'}`}>
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
               <input
+                ref={inputRef}
                 id="search-input"
-                type="search"
+                type="text"
+                autoComplete="off"
                 value={searchValue}
                 onChange={(e) => onSearchChange(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
+                onFocus={() => {
+                  setSearchFocused(true);
+                  if (searchValue.trim().length >= 2 && (suggestions.length > 0 || categorySuggestions.length > 0)) {
+                    setShowDropdown(true);
+                  }
+                }}
                 onBlur={() => setSearchFocused(false)}
+                onKeyDown={handleKeyDown}
                 placeholder="Search products, categories..."
                 aria-label="Search products"
+                aria-expanded={showDropdown}
+                aria-autocomplete="list"
                 className="w-full border-0 bg-transparent py-2.5 pl-10 pr-4 text-sm text-text-primary outline-none placeholder:text-text-muted"
               />
               <button
                 id="search-btn"
+                onClick={() => handleSearch(searchValue)}
                 className="flex items-center justify-center bg-cta px-4 text-white transition-colors hover:bg-cta-dark"
                 aria-label="Search"
               >
                 <Search className="h-4 w-4" />
               </button>
             </div>
+
+            {/* Search Suggestions Dropdown */}
+            {showDropdown && (
+              <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[420px] overflow-y-auto rounded-xl border border-border-color bg-white shadow-xl">
+                {/* Category suggestions */}
+                {categorySuggestions.length > 0 && (
+                  <div className="border-b border-border-color px-3 py-2">
+                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Categories</p>
+                    {categorySuggestions.map((cat, idx) => {
+                      const itemIdx = idx;
+                      return (
+                        <button
+                          key={cat}
+                          onMouseDown={(e) => { e.preventDefault(); handleSelectCategory(cat); }}
+                          onMouseEnter={() => setHighlightIndex(itemIdx)}
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors ${
+                            highlightIndex === itemIdx ? 'bg-primary/10 text-text-primary' : 'text-text-secondary hover:bg-gray-50'
+                          }`}
+                        >
+                          <Search className="h-3.5 w-3.5 flex-shrink-0 text-text-muted" />
+                          <span>
+                            in <span className="font-semibold text-text-primary">{cat}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Product suggestions */}
+                {suggestions.length > 0 && (
+                  <div className="px-3 py-2">
+                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Products</p>
+                    {suggestions.map((product, idx) => {
+                      const itemIdx = categorySuggestions.length + idx;
+                      return (
+                        <button
+                          key={product.id}
+                          onMouseDown={(e) => { e.preventDefault(); handleSelectProduct(product); }}
+                          onMouseEnter={() => setHighlightIndex(itemIdx)}
+                          className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                            highlightIndex === itemIdx ? 'bg-primary/10' : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          {product.image ? (
+                            <img
+                              src={product.image.startsWith('http') ? product.image : `${API_BASE}${product.image}`}
+                              alt={product.name}
+                              className="h-10 w-10 flex-shrink-0 rounded-lg border border-border-color object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-text-muted">
+                              <Search className="h-4 w-4" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-text-primary">{product.name}</p>
+                            <p className="text-xs text-text-muted">
+                              {product.brand && <span>{product.brand} · </span>}
+                              {product.category}
+                            </p>
+                          </div>
+                          <span className="flex-shrink-0 text-sm font-semibold text-cta">
+                            ₹{product.price.toLocaleString()}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Search for full text */}
+                {searchValue.trim() && (
+                  <div className="border-t border-border-color px-3 py-2">
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleSearch(searchValue); }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium text-cta transition-colors hover:bg-primary/10"
+                    >
+                      <Search className="h-3.5 w-3.5" />
+                      Search for &quot;{searchValue}&quot;
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right section */}

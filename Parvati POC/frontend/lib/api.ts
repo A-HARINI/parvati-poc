@@ -109,3 +109,28 @@ export async function fetchBrands(): Promise<string[]> {
     return [];
   }
 }
+
+export interface SearchSuggestion {
+  id: string;
+  name: string;
+  category: string;
+  brand: string;
+  image: string;
+  price: number;
+}
+
+export interface SearchSuggestionsResponse {
+  products: SearchSuggestion[];
+  categories: string[];
+}
+
+export async function fetchSearchSuggestions(query: string): Promise<SearchSuggestionsResponse> {
+  if (!query.trim()) return { products: [], categories: [] };
+  try {
+    const res = await fetch(`${API_BASE}/api/products/search-suggestions?q=${encodeURIComponent(query)}`);
+    if (!res.ok) return { products: [], categories: [] };
+    return res.json();
+  } catch {
+    return { products: [], categories: [] };
+  }
+}
