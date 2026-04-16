@@ -58,7 +58,7 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<Produ
   if (filters.limit) params.set('limit', String(filters.limit));
 
   const res = await fetch(`${API_BASE}/api/products?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 30 },
   });
 
   if (!res.ok) {
@@ -71,16 +71,14 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<Produ
 export async function fetchCategories(): Promise<string[]> {
   try {
     const res = await fetch(`${API_BASE}/api/categories`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     });
     if (!res.ok) {
-      // Fallback to old endpoint if new one fails
-      const fallbackRes = await fetch(`${API_BASE}/api/products/categories`, { cache: 'no-store' });
+      const fallbackRes = await fetch(`${API_BASE}/api/products/categories`, { next: { revalidate: 60 } });
       if (!fallbackRes.ok) return [];
       return fallbackRes.json();
     }
     const categories = await res.json();
-    // Extract active category names
     return categories
       .filter((cat: { isActive: boolean }) => cat.isActive)
       .map((cat: { name: string }) => cat.name);
@@ -92,7 +90,7 @@ export async function fetchCategories(): Promise<string[]> {
 export async function fetchPriceRange(): Promise<{ minPrice: number; maxPrice: number }> {
   try {
     const res = await fetch(`${API_BASE}/api/products/price-range`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     });
     if (!res.ok) return { minPrice: 0, maxPrice: 10000 };
     return res.json();
@@ -104,7 +102,7 @@ export async function fetchPriceRange(): Promise<{ minPrice: number; maxPrice: n
 export async function fetchBrands(): Promise<string[]> {
   try {
     const res = await fetch(`${API_BASE}/api/products/brands`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     });
     if (!res.ok) return [];
     return res.json();

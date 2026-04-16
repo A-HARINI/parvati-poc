@@ -8,11 +8,13 @@ export default async function Home() {
   let products: Product[] = [];
 
   try {
-    [categories, brands] = await Promise.all([
+    const [cats, brs, data] = await Promise.all([
       fetchCategories(),
       fetchBrands(),
+      fetchProducts({ limit: 8, sort: 'newest' }),
     ]);
-    const data = await fetchProducts({ limit: 8, sort: 'newest' });
+    categories = cats;
+    brands = brs;
     products = data.products;
   } catch (error) {
     console.error('Failed to fetch initial data:', error);
