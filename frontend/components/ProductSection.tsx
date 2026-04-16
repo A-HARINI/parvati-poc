@@ -104,15 +104,9 @@ export default function ProductSection({
     }
   }, [search, filters, sort, page, priceRange]);
 
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 400);
-    return () => clearTimeout(timer);
-  }, [search]);
-
   useEffect(() => {
     fetchProducts();
-  }, [debouncedSearch, filters, sort, page]);
+  }, [search, filters, sort, page]);
 
   const handleFilterChange = (name: string, value: string | number) => {
     setFilters((current) => ({ ...current, [name]: value }));

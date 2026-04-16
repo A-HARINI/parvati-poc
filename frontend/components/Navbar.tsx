@@ -16,6 +16,7 @@ interface NavbarProps {
 export default function Navbar({ searchValue, onSearchChange, cartCount = 0, categories = [], selectedCategory = 'All', onCategoryChange }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [inputValue, setInputValue] = useState(searchValue);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [categorySuggestions, setCategorySuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -24,6 +25,11 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Sync inputValue when parent searchValue changes (e.g. reset)
+  useEffect(() => {
+    setInputValue(searchValue);
+  }, [searchValue]);
 
   const API_BASE = '';
 
@@ -52,9 +58,9 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchSuggestions(searchValue), 250);
+    debounceRef.current = setTimeout(() => fetchSuggestions(inputValue), 250);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [searchValue, fetchSuggestions]);
+  }, [inputValue, fetchSuggestions]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -69,16 +75,19 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
 
   const handleSearch = (query: string) => {
     setShowDropdown(false);
+    setInputValue(query);
     onSearchChange(query);
   };
 
   const handleSelectProduct = (product: SearchSuggestion) => {
     setShowDropdown(false);
+    setInputValue(product.name);
     onSearchChange(product.name);
   };
 
   const handleSelectCategory = (category: string) => {
     setShowDropdown(false);
+    setInputValue('');
     onSearchChange('');
     onCategoryChange?.(category);
   };
@@ -91,7 +100,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showDropdown || allItems.length === 0) {
       if (e.key === 'Enter') {
-        handleSearch(searchValue);
+        handleSearch(inputValue);
       }
       return;
     }
@@ -115,7 +124,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
             handleSelectProduct(item.value as SearchSuggestion);
           }
         } else {
-          handleSearch(searchValue);
+          handleSearch(inputValue);
         }
         break;
       case 'Escape':
@@ -164,11 +173,11 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
                 id="search-input"
                 type="text"
                 autoComplete="off"
-                value={searchValue}
-                onChange={(e) => onSearchChange(e.target.value)}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
                 onFocus={() => {
                   setSearchFocused(true);
-                  if (searchValue.trim().length >= 2 && (suggestions.length > 0 || categorySuggestions.length > 0)) {
+                  if (inputValue.trim().length >= 2 && (suggestions.length > 0 || categorySuggestions.length > 0)) {
                     setShowDropdown(true);
                   }
                 }}
@@ -182,7 +191,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
               />
               <button
                 id="search-btn"
-                onClick={() => handleSearch(searchValue)}
+                onClick={() => handleSearch(inputValue)}
                 className="flex items-center justify-center bg-cta px-4 text-white transition-colors hover:bg-cta-dark"
                 aria-label="Search"
               >

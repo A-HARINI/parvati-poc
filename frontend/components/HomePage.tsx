@@ -18,7 +18,7 @@ export default function HomePage({ categories, brands }: HomePageProps) {
 
   const handleSearch = (value: string) => {
     setSearch(value);
-    if (value.length > 2) {
+    if (value.trim()) {
       router.push(`/products?search=${encodeURIComponent(value)}`);
     }
   };
