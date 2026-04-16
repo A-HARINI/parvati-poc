@@ -95,8 +95,8 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
   }, [next, slides.length]);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl mx-4 sm:mx-6 mt-5">
-      <div className="relative h-[280px] sm:h-[340px] md:h-[400px]">
+    <section className="relative overflow-hidden">
+      <div className="relative h-[300px] sm:h-[380px] md:h-[440px]">
         {slides.map((slide, idx) => (
           <div
             key={slide.category}

@@ -94,15 +94,13 @@ export default function HomePage({ categories, brands, showcaseProducts = [] }: 
         onSearchChange={handleSearch}
         cartCount={0}
         categories={categories}
-        selectedCategory="All"
+        selectedCategory=""
         onCategoryChange={handleCategoryClick}
       />
 
       <main>
         {/* Hero */}
-        <div className="mx-auto max-w-[1440px]">
-          <HeroSlider categories={categories} onCategoryClick={handleCategoryClick} />
-        </div>
+        <HeroSlider categories={categories} onCategoryClick={handleCategoryClick} />
 
         {/* Trust Badges */}
         <div className="border-b border-border-color bg-white">
@@ -168,8 +166,8 @@ export default function HomePage({ categories, brands, showcaseProducts = [] }: 
 
         {/* Featured Products */}
         {showcaseProducts.length > 0 && (
-          <section className="bg-gradient-to-b from-white to-gray-50/50 border-y border-border-color">
-            <div className="mx-auto max-w-[1440px] px-4 sm:px-6 py-14">
+          <section className="bg-white border-y border-border-color">
+            <div className="mx-auto max-w-[1440px] px-6 sm:px-10 py-14">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-2xl font-bold text-text-primary">Featured Products</h2>
@@ -212,9 +210,8 @@ export default function HomePage({ categories, brands, showcaseProducts = [] }: 
                   <ChevronRight className="h-5 w-5" />
                 </button>
 
-                {/* Fade edges */}
-                <div className="pointer-events-none absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-white to-transparent" />
-                <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-gray-50 to-transparent" />
+                {/* Fade edge */}
+                <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-white to-transparent" />
               </div>
 
               <button

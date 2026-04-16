@@ -38,13 +38,15 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <article className="product-card group relative flex flex-col overflow-hidden rounded-2xl border border-border-color bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 fade-in">
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-gray-50 to-white p-5">
-        <img
-          src={normalizeImageUrl(product.image)}
-          alt={product.name}
-          className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-        />
+      <div className="relative overflow-hidden bg-gray-50 p-4">
+        <div className="aspect-square w-full overflow-hidden rounded-xl bg-white">
+          <img
+            src={normalizeImageUrl(product.image)}
+            alt={product.name}
+            className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
         {/* Out of stock overlay */}
         {!product.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
@@ -90,7 +92,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </span>
 
         {/* Title */}
-        <h3 className="mb-2 line-clamp-2 text-[13px] font-semibold leading-snug text-text-primary group-hover:text-cta transition-colors cursor-pointer">
+        <h3 className="mb-2 line-clamp-2 min-h-[2.5rem] text-[13px] font-semibold leading-snug text-text-primary group-hover:text-cta transition-colors cursor-pointer">
           {product.name}
         </h3>
 
