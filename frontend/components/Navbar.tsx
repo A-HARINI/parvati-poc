@@ -187,8 +187,25 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
                 aria-label="Search products"
                 aria-expanded={showDropdown}
                 aria-autocomplete="list"
-                className="w-full border-0 bg-transparent py-2.5 pl-10 pr-4 text-sm text-text-primary outline-none placeholder:text-text-muted"
+                className="w-full border-0 bg-transparent py-2.5 pl-10 pr-9 text-sm text-text-primary outline-none placeholder:text-text-muted"
               />
+              {inputValue && (
+                <button
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setInputValue('');
+                    setSuggestions([]);
+                    setCategorySuggestions([]);
+                    setShowDropdown(false);
+                    onSearchChange('');
+                    inputRef.current?.focus();
+                  }}
+                  className="absolute right-[52px] top-1/2 -translate-y-1/2 rounded-full p-1 text-text-muted transition-colors hover:bg-gray-100 hover:text-text-primary"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
               <button
                 id="search-btn"
                 onClick={() => handleSearch(inputValue)}
