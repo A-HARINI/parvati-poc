@@ -53,7 +53,8 @@ router.post(
     }
 
     const files = req.files as Express.Multer.File[];
-    const urls = files.map((file) => `/uploads/${file.filename}`);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const urls = files.map((file) => `${baseUrl}/uploads/${file.filename}`);
 
     res.json({
       message: `${files.length} file(s) uploaded successfully`,
