@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 interface HeroSlide {
   category: string;
@@ -9,7 +9,8 @@ interface HeroSlide {
   subtitle: string;
   cta: string;
   gradient: string;
-  icon: string;
+  image: string;
+  badge: string;
 }
 
 interface HeroSliderProps {
@@ -17,28 +18,32 @@ interface HeroSliderProps {
   onCategoryClick: (category: string) => void;
 }
 
-const categoryMeta: Record<string, { icon: string; subtitle: string; gradient: string }> = {
+const categoryMeta: Record<string, { image: string; subtitle: string; gradient: string; badge: string }> = {
   'Food Consumer Goods': {
-    icon: '🍫',
-    subtitle: 'Discover delicious snacks, beverages & everyday food items from premium brands',
-    gradient: 'from-amber-600 to-orange-700',
+    image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&h=500&fit=crop&q=80',
+    subtitle: 'Delicious snacks, beverages & everyday food essentials from top brands',
+    gradient: 'from-orange-600 via-amber-600 to-yellow-500',
+    badge: '🍫 Premium Selection',
   },
   'NON Food Consumer Goods': {
-    icon: '🧴',
+    image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=500&fit=crop&q=80',
     subtitle: 'Personal care, stationery & household essentials you can count on',
-    gradient: 'from-blue-600 to-indigo-700',
+    gradient: 'from-blue-700 via-indigo-600 to-violet-500',
+    badge: '🧴 Best Sellers',
   },
   'Pet Care Brands': {
-    icon: '🐾',
-    subtitle: 'Premium nutrition & care products to keep your pets happy and healthy',
-    gradient: 'from-emerald-600 to-teal-700',
+    image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&h=500&fit=crop&q=80',
+    subtitle: 'Premium nutrition & care products for your furry friends',
+    gradient: 'from-teal-600 via-emerald-600 to-green-500',
+    badge: '🐾 Pet Lovers Choice',
   },
 };
 
 const defaultMeta = {
-  icon: '🛍️',
-  subtitle: 'Discover amazing products at great prices',
-  gradient: 'from-gray-700 to-gray-900',
+  image: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=600&h=500&fit=crop&q=80',
+  subtitle: 'Discover amazing products at unbeatable prices',
+  gradient: 'from-gray-800 via-gray-700 to-gray-600',
+  badge: '🛍️ Shop Now',
 };
 
 export default function HeroSlider({ categories, onCategoryClick }: HeroSliderProps) {
@@ -50,19 +55,20 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
       subtitle: meta.subtitle,
       cta: `Shop ${cat}`,
       gradient: meta.gradient,
-      icon: meta.icon,
+      image: meta.image,
+      badge: meta.badge,
     };
   });
 
-  // Fallback if no categories
   if (slides.length === 0) {
     slides.push({
       category: 'All',
       title: 'Welcome to Parvati',
-      subtitle: 'Your one-stop shop for the best products',
+      subtitle: 'Your one-stop shop for quality products',
       cta: 'Shop Now',
-      gradient: 'from-blue-600 to-indigo-700',
-      icon: '🛍️',
+      gradient: 'from-blue-700 via-indigo-600 to-violet-500',
+      image: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=600&h=500&fit=crop&q=80',
+      badge: '🛍️ Explore',
     });
   }
 
@@ -74,7 +80,7 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
       if (isTransitioning) return;
       setIsTransitioning(true);
       setCurrent(index);
-      setTimeout(() => setIsTransitioning(false), 500);
+      setTimeout(() => setIsTransitioning(false), 600);
     },
     [isTransitioning]
   );
@@ -87,7 +93,6 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
     goTo((current - 1 + slides.length) % slides.length);
   }, [current, slides.length, goTo]);
 
-  // Auto-advance every 5 seconds
   useEffect(() => {
     if (slides.length <= 1) return;
     const timer = setInterval(next, 5000);
@@ -95,46 +100,72 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
   }, [next, slides.length]);
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="relative h-[300px] sm:h-[380px] md:h-[440px]">
+    <section className="relative overflow-hidden bg-gray-900">
+      <div className="relative h-[320px] sm:h-[400px] md:h-[480px]">
         {slides.map((slide, idx) => (
           <div
             key={slide.category}
-            className={`absolute inset-0 flex items-center transition-all duration-500 ease-in-out bg-gradient-to-br ${slide.gradient} ${
-              idx === current ? 'opacity-100 translate-x-0' : idx < current ? 'opacity-0 -translate-x-full' : 'opacity-0 translate-x-full'
+            className={`absolute inset-0 transition-all duration-600 ease-in-out ${
+              idx === current ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
             }`}
           >
-            {/* Decorative shapes */}
-            <div className="absolute right-0 top-0 h-full w-1/2 opacity-10">
-              <div className="absolute right-10 top-10 h-40 w-40 rounded-full bg-white/30" />
-              <div className="absolute right-32 bottom-10 h-24 w-24 rounded-full bg-white/20" />
-              <div className="absolute right-60 top-20 h-16 w-16 rounded-full bg-white/25" />
-            </div>
+            {/* Gradient background */}
+            <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`} />
 
-            <div className="relative z-10 flex w-full items-center justify-between px-8 sm:px-12 md:px-16">
-              <div className="max-w-lg">
-                <span className="mb-3 inline-block rounded-full bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white/90 backdrop-blur-sm">
-                  Featured Category
+            {/* Pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.07]" style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+              backgroundSize: '40px 40px',
+            }} />
+
+            {/* Content */}
+            <div className="relative z-10 mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 sm:px-10 md:px-16">
+              {/* Left text */}
+              <div className="max-w-xl">
+                <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {slide.badge}
                 </span>
-                <h2 className="mb-3 text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">
+                <h2 className="mb-4 text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-[3.25rem] md:leading-[1.1]">
                   {slide.title}
                 </h2>
-                <p className="mb-6 text-base text-white/80 sm:text-lg">
+                <p className="mb-8 max-w-md text-base leading-relaxed text-white/75 sm:text-lg">
                   {slide.subtitle}
                 </p>
-                <button
-                  onClick={() => onCategoryClick(slide.category)}
-                  className="btn-press inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow-lg transition hover:shadow-xl hover:scale-105"
-                >
-                  {slide.cta}
-                  <ChevronRight className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => onCategoryClick(slide.category)}
+                    className="btn-press inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-gray-900 shadow-xl transition-all hover:shadow-2xl hover:scale-105"
+                  >
+                    {slide.cta}
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => onCategoryClick('All')}
+                    className="inline-flex items-center gap-1.5 rounded-xl border-2 border-white/30 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/50"
+                  >
+                    View All
+                  </button>
+                </div>
               </div>
 
-              <div className="hidden md:flex items-center justify-center">
-                <span className="text-[120px] leading-none drop-shadow-lg select-none">
-                  {slide.icon}
-                </span>
+              {/* Right image */}
+              <div className="hidden md:block relative">
+                <div className="relative h-[320px] w-[340px] lg:h-[360px] lg:w-[380px]">
+                  {/* Glow behind image */}
+                  <div className="absolute inset-0 rounded-3xl bg-white/10 blur-2xl scale-110" />
+                  {/* Image container */}
+                  <div className="relative h-full w-full overflow-hidden rounded-3xl border-2 border-white/20 shadow-2xl">
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="h-full w-full object-cover"
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                    />
+                    {/* Subtle overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -146,14 +177,14 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
         <>
           <button
             onClick={prev}
-            className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/40"
+            className="absolute left-4 top-1/2 z-20 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all hover:bg-white/30 hover:scale-110"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={next}
-            className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/40"
+            className="absolute right-4 top-1/2 z-20 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all hover:bg-white/30 hover:scale-110"
             aria-label="Next slide"
           >
             <ChevronRight className="h-5 w-5" />
@@ -163,13 +194,13 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
 
       {/* Dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
           {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => goTo(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                idx === current ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
+              className={`rounded-full transition-all duration-300 ${
+                idx === current ? 'h-3 w-10 bg-white shadow-lg' : 'h-3 w-3 bg-white/40 hover:bg-white/60'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
