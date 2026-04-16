@@ -58,7 +58,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchSuggestions(inputValue), 250);
+    debounceRef.current = setTimeout(() => fetchSuggestions(inputValue), 400);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [inputValue, fetchSuggestions]);
 

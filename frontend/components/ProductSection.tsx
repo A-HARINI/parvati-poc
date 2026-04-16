@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { SlidersHorizontal, Grid3X3, List, ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import Navbar from './Navbar';
 import FiltersSidebar from './FiltersSidebar';
@@ -77,8 +77,14 @@ export default function ProductSection({
   const [search, setSearch] = useState(initialSearch || '');
   const [sort, setSort] = useState(initialSort || 'newest');
   const [hotDeal, setHotDeal] = useState(initialHotDeal || false);
+  const [activeNavItem, setActiveNavItem] = useState(() => {
+    if (initialHotDeal) return 'Hot Sales';
+    if (initialCategory && initialCategory !== 'All') return initialCategory;
+    return 'All';
+  });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const isFirstRender = useRef(true);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -108,14 +114,22 @@ export default function ProductSection({
     } finally {
       setLoading(false);
     }
-  }, [search, filters, sort, page, priceRange]);
+  }, [search, filters, sort, page, priceRange, hotDeal]);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     fetchProducts();
-  }, [search, filters, sort, page, hotDeal]);
+  }, [search, filters, sort, page, hotDeal, fetchProducts]);
 
   const handleFilterChange = (name: string, value: string | number) => {
     setFilters((current) => ({ ...current, [name]: value }));
+    if (name === 'category') {
+      setActiveNavItem(value === 'All' ? 'All' : String(value));
+      setHotDeal(false);
+    }
     setPage(1);
   };
 
@@ -129,6 +143,8 @@ export default function ProductSection({
       availability: 'all',
     });
     setSearch('');
+    setHotDeal(false);
+    setActiveNavItem('All');
     setPage(1);
   };
 
@@ -155,8 +171,9 @@ export default function ProductSection({
         onSearchChange={setSearch}
         cartCount={0}
         categories={initialCategories}
-        selectedCategory={filters.category}
+        selectedCategory={activeNavItem}
         onCategoryChange={(cat) => {
+          setActiveNavItem(cat);
           if (cat === 'Hot Sales') {
             setHotDeal(true);
             setSort('newest');
@@ -169,7 +186,7 @@ export default function ProductSection({
             setPage(1);
           } else {
             setHotDeal(false);
-            handleFilterChange('category', cat);
+            handleFilterChange('category', cat === 'All' ? 'All' : cat);
           }
         }}
       />

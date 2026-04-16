@@ -2,11 +2,11 @@ import ProductSection from '@/components/ProductSection';
 import { fetchProducts, fetchCategories, fetchPriceRange, fetchBrands } from '@/lib/api';
 
 interface ProductsPageProps {
-  searchParams: Promise<{ category?: string; brand?: string; search?: string; sort?: string; hotDeal?: string }>;
+  searchParams: { category?: string; brand?: string; search?: string; sort?: string; hotDeal?: string };
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const params = await searchParams;
+  const params = searchParams;
   const category = params.category || '';
   const brand = params.brand || '';
   const search = params.search || '';
