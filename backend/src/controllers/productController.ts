@@ -4,7 +4,7 @@ import { createZohoItem, updateZohoStock } from '../services/zohoService';
 
 export async function createProduct(req: Request, res: Response, next: NextFunction) {
   try {
-    const { name, description, category, brand, price, rating, available, image, images, stock } = req.body;
+    const { name, description, category, brand, price, rating, available, image, images, stock, hotDeal } = req.body;
 
     const product = await productModel.createProduct({
       name,
@@ -17,6 +17,7 @@ export async function createProduct(req: Request, res: Response, next: NextFunct
       image,
       images: images || [],
       stock,
+      hotDeal,
     });
 
     // Attempt Zoho integration (non-blocking)
@@ -49,6 +50,7 @@ export async function getProducts(req: Request, res: Response, next: NextFunctio
     const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
     const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
     const availability = String(req.query.availability || '');
+    const hotDeal = req.query.hotDeal === 'true';
     const sort = String(req.query.sort || 'newest');
 
     const data = await productModel.searchProducts({
@@ -59,6 +61,7 @@ export async function getProducts(req: Request, res: Response, next: NextFunctio
       maxPrice,
       rating,
       availability,
+      hotDeal,
       sort,
       page,
       limit,

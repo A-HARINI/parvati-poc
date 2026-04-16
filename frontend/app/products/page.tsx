@@ -2,7 +2,7 @@ import ProductSection from '@/components/ProductSection';
 import { fetchProducts, fetchCategories, fetchPriceRange, fetchBrands } from '@/lib/api';
 
 interface ProductsPageProps {
-  searchParams: Promise<{ category?: string; brand?: string; search?: string }>;
+  searchParams: Promise<{ category?: string; brand?: string; search?: string; sort?: string; hotDeal?: string }>;
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
@@ -10,6 +10,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const category = params.category || '';
   const brand = params.brand || '';
   const search = params.search || '';
+  const sort = params.sort || '';
+  const hotDeal = params.hotDeal === 'true';
 
   let initialData;
   let categories: string[];
@@ -23,6 +25,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         ...(category ? { category } : {}),
         ...(brand ? { brand } : {}),
         ...(search ? { search } : {}),
+        ...(sort ? { sort } : {}),
+        ...(hotDeal ? { hotDeal: true } : {}),
       }),
       fetchCategories(),
       fetchBrands(),
@@ -46,6 +50,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         initialCategory={category || undefined}
         initialBrand={brand || undefined}
         initialSearch={search || undefined}
+        initialSort={sort || undefined}
+        initialHotDeal={hotDeal}
       />
     </div>
   );

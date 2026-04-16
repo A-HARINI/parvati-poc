@@ -54,7 +54,14 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
         {/* Deal badge */}
-        {product.price < 100 && product.available && (
+        {product.hotDeal && product.available && (
+          <div className="absolute left-3 top-3">
+            <span className="rounded-lg bg-orange-500 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+              🔥 Hot
+            </span>
+          </div>
+        )}
+        {!product.hotDeal && product.price < 100 && product.available && (
           <div className="absolute left-3 top-3">
             <span className="rounded-lg bg-danger px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
               Deal

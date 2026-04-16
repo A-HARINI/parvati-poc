@@ -11,6 +11,7 @@ export interface IProduct extends Document {
   image: string;
   images: string[];
   stock: number;
+  hotDeal: boolean;
   zoho_item_id?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -70,6 +71,11 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       default: 0,
       min: 0,
+    },
+    hotDeal: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
     zoho_item_id: {
       type: String,

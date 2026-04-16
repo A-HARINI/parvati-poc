@@ -34,6 +34,8 @@ interface ProductSectionProps {
   initialCategory?: string;
   initialBrand?: string;
   initialSearch?: string;
+  initialSort?: string;
+  initialHotDeal?: boolean;
 }
 
 const API_BASE = '';
@@ -46,6 +48,8 @@ export default function ProductSection({
   initialCategory,
   initialBrand,
   initialSearch,
+  initialSort,
+  initialHotDeal,
 }: ProductSectionProps) {
   const [products, setProducts] = useState<Product[]>(initialData.products);
   const [total, setTotal] = useState(initialData.total);
@@ -71,7 +75,8 @@ export default function ProductSection({
   });
 
   const [search, setSearch] = useState(initialSearch || '');
-  const [sort, setSort] = useState('newest');
+  const [sort, setSort] = useState(initialSort || 'newest');
+  const [hotDeal, setHotDeal] = useState(initialHotDeal || false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -86,6 +91,7 @@ export default function ProductSection({
       if (filters.maxPrice < priceRange.max) params.set('maxPrice', String(filters.maxPrice));
       if (filters.rating > 0) params.set('rating', String(filters.rating));
       if (filters.availability !== 'all') params.set('availability', filters.availability);
+      if (hotDeal) params.set('hotDeal', 'true');
       params.set('sort', sort);
       params.set('page', String(page));
       params.set('limit', '12');
@@ -106,7 +112,7 @@ export default function ProductSection({
 
   useEffect(() => {
     fetchProducts();
-  }, [search, filters, sort, page]);
+  }, [search, filters, sort, page, hotDeal]);
 
   const handleFilterChange = (name: string, value: string | number) => {
     setFilters((current) => ({ ...current, [name]: value }));
@@ -150,7 +156,22 @@ export default function ProductSection({
         cartCount={0}
         categories={initialCategories}
         selectedCategory={filters.category}
-        onCategoryChange={(cat) => handleFilterChange('category', cat)}
+        onCategoryChange={(cat) => {
+          if (cat === 'Hot Sales') {
+            setHotDeal(true);
+            setSort('newest');
+            setFilters((f) => ({ ...f, category: 'All' }));
+            setPage(1);
+          } else if (cat === 'New Arrivals') {
+            setHotDeal(false);
+            setSort('newest');
+            setFilters((f) => ({ ...f, category: 'All' }));
+            setPage(1);
+          } else {
+            setHotDeal(false);
+            handleFilterChange('category', cat);
+          }
+        }}
       />
 
       <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6">

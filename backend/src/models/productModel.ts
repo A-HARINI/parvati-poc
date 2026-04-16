@@ -11,6 +11,7 @@ export async function createProduct(data: {
   image?: string;
   images?: string[];
   stock?: number;
+  hotDeal?: boolean;
   zoho_item_id?: string;
 }) {
   const product = await Product.create(data);
@@ -53,6 +54,7 @@ export async function searchProducts(options: {
   maxPrice?: number;
   rating?: number;
   availability?: string;
+  hotDeal?: boolean;
   sort?: string;
   page?: number;
   limit?: number;
@@ -100,6 +102,11 @@ export async function searchProducts(options: {
     filter.available = true;
   } else if (options.availability === 'unavailable') {
     filter.available = false;
+  }
+
+  // Hot deals filter
+  if (options.hotDeal) {
+    filter.hotDeal = true;
   }
 
   // Sort mapping

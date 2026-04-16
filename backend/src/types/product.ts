@@ -9,5 +9,6 @@ export type Product = {
   available: boolean;
   image?: string;
   stock?: number;
+  hotDeal?: boolean;
   zoho_item_id?: string;
 };

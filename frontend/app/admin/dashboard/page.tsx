@@ -29,6 +29,7 @@ interface ProductForm {
   price: string;
   rating: string;
   available: boolean;
+  hotDeal: boolean;
   image: string;
   images: string[];
   stock: string;
@@ -36,7 +37,7 @@ interface ProductForm {
 
 const emptyForm: ProductForm = {
   name: '', description: '', category: '', brand: '', price: '', rating: '0',
-  available: true, image: '', images: [], stock: '0',
+  available: true, hotDeal: false, image: '', images: [], stock: '0',
 };
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
@@ -178,6 +179,7 @@ export default function AdminDashboard() {
       price: String(product.price),
       rating: String(product.rating),
       available: product.available,
+      hotDeal: (product as any).hotDeal || false,
       image: product.image || '',
       images: (product as any).images || [],
       stock: String(product.stock || 0),
@@ -242,6 +244,7 @@ export default function AdminDashboard() {
       price: parseFloat(form.price),
       rating: parseFloat(form.rating) || 0,
       available: form.available,
+      hotDeal: form.hotDeal,
       image: form.image.trim() || (form.images.length > 0 ? form.images[0] : ''),
       images: form.images,
       stock: parseInt(form.stock) || 0,
@@ -737,6 +740,10 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3">
                   <input type="checkbox" id="available" checked={form.available} onChange={(e) => updateForm('available', e.target.checked)} className="h-4 w-4 rounded" style={{ accentColor: '#1793e7' }} />
                   <label htmlFor="available" className="text-sm font-medium text-text-primary">Available (In Stock)</label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input type="checkbox" id="hotDeal" checked={form.hotDeal} onChange={(e) => updateForm('hotDeal', e.target.checked)} className="h-4 w-4 rounded" style={{ accentColor: '#f97316' }} />
+                  <label htmlFor="hotDeal" className="text-sm font-medium text-text-primary">🔥 Hot Deal</label>
                 </div>
               </div>
             </div>

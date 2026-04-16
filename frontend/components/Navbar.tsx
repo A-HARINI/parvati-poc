@@ -136,8 +136,8 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
 
   return (
     <>
-      {/* Main header — white with yellow accent stripe */}
-      <header className="sticky top-0 z-50 bg-white shadow-nav">
+      {/* Main header — dark with yellow accent stripe */}
+      <header className="sticky top-0 z-50 bg-gray-900 shadow-nav">
         {/* Yellow accent line */}
         <div className="h-1 primary-gradient" />
 
@@ -146,7 +146,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
           <button
             id="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="rounded-xl p-2 text-text-primary transition hover:bg-gray-100 lg:hidden"
+            className="rounded-xl p-2 text-white transition hover:bg-gray-700 lg:hidden"
             aria-label="Toggle menu"
           >
             <Menu className="h-5 w-5" />
@@ -154,20 +154,20 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
 
           {/* Logo */}
           <a href="/" id="logo-link" className="flex flex-shrink-0 items-center">
-            <img src="/logo-black.png" alt="Parvati" className="h-9 w-auto" />
+            <img src="/logo-white.webp" alt="Parvati" className="h-9 w-auto" />
           </a>
 
           {/* Categories dropdown — desktop */}
           <div className="hidden items-center lg:flex">
-            <button className="flex items-center gap-1 rounded-xl border border-border-color px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-gray-50 hover:border-gray-300">
-              Categories <ChevronDown className="h-3.5 w-3.5 text-text-muted" />
+            <button className="flex items-center gap-1 rounded-xl border border-gray-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-700 hover:border-gray-500">
+              Categories <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
             </button>
           </div>
 
           {/* Search bar — centered */}
           <div className="relative flex flex-1 mx-1 sm:mx-3 max-w-2xl" ref={dropdownRef}>
-            <div className={`flex w-full overflow-hidden rounded-xl border-2 transition-all ${searchFocused ? 'border-cta shadow-glow' : 'border-border-color'}`}>
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
+            <div className={`flex w-full overflow-hidden rounded-xl border-2 transition-all ${searchFocused ? 'border-cta shadow-glow' : 'border-gray-600'}`}>
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 z-10" />
               <input
                 ref={inputRef}
                 id="search-input"
@@ -187,7 +187,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
                 aria-label="Search products"
                 aria-expanded={showDropdown}
                 aria-autocomplete="list"
-                className="w-full border-0 bg-transparent py-2.5 pl-10 pr-9 text-sm text-text-primary outline-none placeholder:text-text-muted"
+                className="w-full border-0 bg-gray-800 py-2.5 pl-10 pr-9 text-sm text-white outline-none placeholder:text-gray-400"
               />
               {inputValue && (
                 <button
@@ -200,7 +200,7 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
                     onSearchChange('');
                     inputRef.current?.focus();
                   }}
-                  className="absolute right-[52px] top-1/2 -translate-y-1/2 rounded-full p-1 text-text-muted transition-colors hover:bg-gray-100 hover:text-text-primary"
+                  className="absolute right-[52px] top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
                   aria-label="Clear search"
                 >
                   <X className="h-4 w-4" />
@@ -307,9 +307,9 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
             {/* Account */}
             <a
               href="/admin"
-              className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-gray-100 lg:flex"
+              className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-700 lg:flex"
             >
-              <User className="h-4 w-4 text-text-muted" />
+              <User className="h-4 w-4 text-gray-400" />
               <span>Account</span>
             </a>
 
@@ -330,19 +330,23 @@ export default function Navbar({ searchValue, onSearchChange, cartCount = 0, cat
         </div>
 
         {/* Sub-navigation — categories bar */}
-        <div className="border-t border-border-color bg-white">
-          <div className="mx-auto flex max-w-[1440px] items-center gap-1 overflow-x-auto px-4 py-1.5 text-sm sm:px-6 scrollbar-none">
-            {['All', ...categories].map((item) => (
+        <div className="border-t border-gray-700 bg-gray-800">
+          <div className="mx-auto flex max-w-[1440px] items-center gap-2 overflow-x-auto px-4 py-2 text-sm sm:px-6 scrollbar-none">
+            {['All', 'Hot Sales', 'New Arrivals', ...categories].map((item) => (
               <button
                 key={item}
                 onClick={() => onCategoryChange?.(item)}
-                className={`flex-shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                className={`flex-shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   selectedCategory === item
-                    ? 'bg-primary/20 font-semibold text-text-primary'
-                    : 'text-text-secondary hover:bg-gray-100 hover:text-text-primary'
+                    ? 'bg-primary/20 font-semibold text-white'
+                    : item === 'Hot Sales'
+                    ? 'text-orange-400 font-semibold hover:bg-gray-700 hover:text-orange-300'
+                    : item === 'New Arrivals'
+                    ? 'text-emerald-400 font-semibold hover:bg-gray-700 hover:text-emerald-300'
+                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                {item === 'All' ? 'All Products' : item}
+                {item === 'All' ? 'All Products' : item === 'Hot Sales' ? '🔥 Hot Sales' : item === 'New Arrivals' ? '✨ New Arrivals' : item}
               </button>
             ))}
           </div>

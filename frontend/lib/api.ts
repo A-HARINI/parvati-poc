@@ -22,6 +22,7 @@ export interface Product {
   image: string;
   images: string[];
   stock: number;
+  hotDeal?: boolean;
   zoho_item_id?: string;
   createdAt: string;
   updatedAt: string;
@@ -35,6 +36,7 @@ export interface ProductFilters {
   maxPrice?: number;
   rating?: number;
   availability?: string;
+  hotDeal?: boolean;
   sort?: string;
   page?: number;
   limit?: number;
@@ -50,6 +52,7 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<Produ
   if (filters.maxPrice !== undefined) params.set('maxPrice', String(filters.maxPrice));
   if (filters.rating) params.set('rating', String(filters.rating));
   if (filters.availability) params.set('availability', filters.availability);
+  if (filters.hotDeal) params.set('hotDeal', 'true');
   if (filters.sort) params.set('sort', filters.sort);
   if (filters.page) params.set('page', String(filters.page));
   if (filters.limit) params.set('limit', String(filters.limit));
