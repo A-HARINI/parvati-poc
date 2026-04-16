@@ -247,7 +247,6 @@ export default function HeroSlider({ categories, onCategoryClick }: HeroSliderPr
     </section>
   );
 }
-'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
