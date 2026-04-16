@@ -38,12 +38,12 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <article className="product-card group relative flex flex-col overflow-hidden rounded-2xl border border-border-color bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 fade-in">
       {/* Image */}
-      <div className="relative overflow-hidden bg-gray-50 p-4">
-        <div className="aspect-square w-full overflow-hidden rounded-xl bg-white">
+      <div className="relative overflow-hidden p-3">
+        <div className="aspect-square w-full overflow-hidden rounded-xl bg-gray-100">
           <img
             src={normalizeImageUrl(product.image)}
             alt={product.name}
-            className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
         </div>
