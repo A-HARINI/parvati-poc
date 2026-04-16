@@ -168,28 +168,14 @@ export default function HomePage({ categories, brands, showcaseProducts = [] }: 
 
         {/* Featured Products */}
         {showcaseProducts.length > 0 && (
-          <section className="bg-white border-y border-border-color">
-            <div className="mx-auto max-w-[1440px] px-4 sm:px-6 py-12">
+          <section className="bg-gradient-to-b from-white to-gray-50/50 border-y border-border-color">
+            <div className="mx-auto max-w-[1440px] px-4 sm:px-6 py-14">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-2xl font-bold text-text-primary">Featured Products</h2>
                   <p className="mt-1 text-sm text-text-muted">Handpicked just for you</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-2">
-                    <button
-                      onClick={() => scrollProducts('left')}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-border-color text-text-muted transition hover:border-cta hover:text-cta"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => scrollProducts('right')}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-border-color text-text-muted transition hover:border-cta hover:text-cta"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  </div>
                   <button
                     onClick={() => router.push('/products')}
                     className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-cta hover:text-cta-dark transition"
@@ -199,15 +185,36 @@ export default function HomePage({ categories, brands, showcaseProducts = [] }: 
                 </div>
               </div>
 
-              <div className="relative">
-                <div ref={scrollRef} className="flex gap-5 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory">
+              <div className="relative group/slider">
+                {/* Left arrow */}
+                <button
+                  onClick={() => scrollProducts('left')}
+                  className="absolute -left-3 top-1/2 z-10 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 shadow-lg transition-all duration-200 hover:bg-cta hover:text-white hover:border-cta hover:shadow-xl opacity-0 group-hover/slider:opacity-100"
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+
+                <div ref={scrollRef} className="no-scrollbar flex gap-5 overflow-x-auto pb-2 snap-x snap-mandatory">
                   {showcaseProducts.map((product) => (
-                    <div key={product._id} className="w-[230px] flex-shrink-0 snap-start sm:w-[255px]">
+                    <div key={product._id} className="w-[240px] flex-shrink-0 snap-start sm:w-[260px]">
                       <ProductCard product={product} />
                     </div>
                   ))}
                 </div>
-                <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-white to-transparent" />
+
+                {/* Right arrow */}
+                <button
+                  onClick={() => scrollProducts('right')}
+                  className="absolute -right-3 top-1/2 z-10 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 shadow-lg transition-all duration-200 hover:bg-cta hover:text-white hover:border-cta hover:shadow-xl opacity-0 group-hover/slider:opacity-100"
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+
+                {/* Fade edges */}
+                <div className="pointer-events-none absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-white to-transparent" />
+                <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-gray-50 to-transparent" />
               </div>
 
               <button
@@ -222,35 +229,36 @@ export default function HomePage({ categories, brands, showcaseProducts = [] }: 
 
         {/* Brands */}
         {brands.length > 0 && (
-          <section className="mx-auto max-w-[1440px] px-4 sm:px-6 py-12">
-            <div className="mb-8">
+          <section className="mx-auto max-w-[1440px] px-4 sm:px-6 py-14">
+            <div className="mb-8 text-center">
               <h2 className="text-2xl font-bold text-text-primary">Top Brands</h2>
               <p className="mt-1 text-sm text-text-muted">Trusted names you love</p>
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none snap-x">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
               {brands.map((brand) => {
                 const logo = brandLogos[brand.toLowerCase()];
                 return (
                   <button
                     key={brand}
                     onClick={() => handleBrandClick(brand)}
-                    className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-border-color bg-white px-8 py-6 flex-shrink-0 snap-start transition-all duration-200 hover:border-cta hover:shadow-md hover:-translate-y-1"
+                    className="group flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-transparent bg-white p-5 transition-all duration-300 hover:border-cta hover:shadow-lg hover:shadow-cta/10 hover:-translate-y-1"
+                    style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
                   >
                     {logo ? (
-                      <div className="flex h-12 w-28 items-center justify-center">
+                      <div className="flex h-14 w-full items-center justify-center">
                         <img
                           src={logo}
                           alt={brand}
-                          className="max-h-full max-w-full object-contain grayscale opacity-60 transition-all duration-200 group-hover:grayscale-0 group-hover:opacity-100"
+                          className="max-h-full max-w-[80px] object-contain grayscale opacity-50 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
                         />
                       </div>
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-xl font-bold text-text-primary transition group-hover:bg-cta/10 group-hover:text-cta">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 text-2xl font-bold text-gray-400 transition-all duration-300 group-hover:bg-cta/10 group-hover:text-cta group-hover:scale-110">
                         {brand.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-xs font-semibold text-text-muted group-hover:text-text-primary whitespace-nowrap transition">
+                    <span className="text-xs font-semibold text-text-muted group-hover:text-cta whitespace-nowrap transition-colors duration-300">
                       {brand}
                     </span>
                   </button>

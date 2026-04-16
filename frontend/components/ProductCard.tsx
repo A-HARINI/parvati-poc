@@ -36,81 +36,93 @@ export default function ProductCard({ product }: { product: Product }) {
   );
 
   return (
-    <article className="product-card group relative flex flex-col overflow-hidden rounded-2xl border border-border-color bg-white fade-in">
+    <article className="product-card group relative flex flex-col overflow-hidden rounded-2xl border border-border-color bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 fade-in">
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-gray-50 p-6">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-gray-50 to-white p-5">
         <img
           src={normalizeImageUrl(product.image)}
           alt={product.name}
-          className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
+          className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
         {/* Out of stock overlay */}
         {!product.available && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/75 backdrop-blur-sm">
-            <span className="rounded-xl bg-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+            <span className="rounded-full bg-gray-900 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg">
               Sold Out
             </span>
           </div>
         )}
-        {/* Deal badge */}
+        {/* Hot badge */}
         {product.hotDeal && product.available && (
           <div className="absolute left-3 top-3">
-            <span className="rounded-lg bg-orange-500 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
-              🔥 Hot
+            <span className="flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md">
+              🔥 Hot Deal
             </span>
           </div>
         )}
+        {/* Deal badge */}
         {!product.hotDeal && product.price < 100 && product.available && (
           <div className="absolute left-3 top-3">
-            <span className="rounded-lg bg-danger px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+            <span className="flex items-center gap-1 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md">
               Deal
             </span>
           </div>
         )}
+        {/* Quick cart on hover */}
+        <div className="absolute bottom-3 right-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <button
+            onClick={handleAddToCart}
+            disabled={!product.available}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-cta text-white shadow-lg transition hover:bg-cta-dark disabled:hidden"
+            aria-label="Quick add to cart"
+          >
+            <ShoppingCart className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col px-4 pb-4 pt-3">
         {/* Category tag */}
-        <span className="mb-1.5 w-fit rounded-md bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
+        <span className="mb-2 w-fit rounded-full bg-gray-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
           {product.category}
         </span>
 
         {/* Title */}
-        <h3 className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-text-primary group-hover:text-cta transition-colors cursor-pointer">
+        <h3 className="mb-2 line-clamp-2 text-[13px] font-semibold leading-snug text-text-primary group-hover:text-cta transition-colors cursor-pointer">
           {product.name}
         </h3>
 
         {/* Rating */}
         <div className="mb-3 flex items-center gap-1.5">
           {renderStars(product.rating)}
-          <span className="text-xs font-medium text-text-muted">
+          <span className="text-xs text-text-muted">
             {product.rating.toFixed(1)}
           </span>
         </div>
 
-        {/* Price */}
-        <div className="mb-1 mt-auto">
-          <div className="flex items-baseline gap-0.5">
-            <span className="text-xs text-text-muted">$</span>
-            <span className="text-xl font-bold text-text-primary">
-              {Math.floor(product.price)}
-            </span>
-            <span className="text-sm font-medium text-text-primary">
-              {(product.price % 1).toFixed(2).substring(1)}
-            </span>
+        {/* Price & Stock */}
+        <div className="mt-auto flex items-end justify-between">
+          <div>
+            <div className="flex items-baseline gap-0.5">
+              <span className="text-xs text-text-muted">$</span>
+              <span className="text-xl font-extrabold text-text-primary">
+                {Math.floor(product.price)}
+              </span>
+              <span className="text-sm font-semibold text-text-primary">
+                {(product.price % 1).toFixed(2).substring(1)}
+              </span>
+            </div>
+            <p className={`mt-0.5 text-[11px] font-semibold ${product.available ? 'text-success' : 'text-danger'}`}>
+              {product.available
+                ? product.stock > 0 && product.stock < 10
+                  ? `Only ${product.stock} left!`
+                  : '✓ In Stock'
+                : 'Unavailable'}
+            </p>
           </div>
         </div>
-
-        {/* Stock status */}
-        <p className={`mb-3 text-xs font-medium ${product.available ? 'text-success' : 'text-danger'}`}>
-          {product.available
-            ? product.stock > 0 && product.stock < 10
-              ? `Only ${product.stock} left`
-              : 'In Stock'
-            : 'Currently unavailable'}
-        </p>
 
         {/* Add to cart button */}
         <button
@@ -118,11 +130,11 @@ export default function ProductCard({ product }: { product: Product }) {
           type="button"
           onClick={handleAddToCart}
           disabled={!product.available}
-          className={`btn-press w-full rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition-all ${
+          className={`mt-3 btn-press w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
             addedToCart
-              ? 'bg-success text-white'
+              ? 'bg-success text-white shadow-sm'
               : product.available
-              ? 'cta-gradient text-white hover:shadow-md hover:shadow-cta/20'
+              ? 'bg-gray-900 text-white hover:bg-cta hover:shadow-md'
               : 'cursor-not-allowed bg-gray-100 text-gray-400'
           }`}
         >
