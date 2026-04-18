@@ -44,6 +44,13 @@ npm run dev
 
 Frontend runs on `http://localhost:3000`
 
+## Deploy on Vercel
+
+This repo is a monorepo: the Next.js app is under `frontend/`.
+
+1. In the Vercel project: **Settings → Build & Deployment → Root Directory** → set **`frontend`** → Save. (This is the usual fix for `404 NOT_FOUND` when the wrong folder is built.)
+2. Commit and push **`vercel.json`**, **`package.json`**, and **`frontend/vercel.json`** so the build configuration is in the repo. Do not list root `vercel.json` in `.gitignore`, or Vercel will never see it.
+
 ## Environment Variables
 
 ### Backend (`backend/.env`)
